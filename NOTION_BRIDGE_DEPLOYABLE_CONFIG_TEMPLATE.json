@@ -52,7 +52,7 @@
       "endpoint": "/search-pages",
       "method": "POST",
       "body": {
-        "query": "Tech Room",
+        "query": "Project Hub",
         "limit": 5
       }
     },
