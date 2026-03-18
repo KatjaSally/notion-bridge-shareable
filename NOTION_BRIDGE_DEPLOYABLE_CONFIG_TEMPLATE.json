@@ -1,0 +1,121 @@
+{
+  "project_name": "notion-bridge",
+  "status": "work-in-progress",
+  "hosting": "netlify-functions",
+  "package_position": "public-shareable-template",
+  "required_files": [
+    "netlify.toml",
+    "netlify/functions/notion-bridge.js"
+  ],
+  "required_environment_variables": {
+    "NOTION_TOKEN": "secret_xxxxxxxxxxxxxxxxx",
+    "TECH_ROOM_PAGE_ID": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+    "BRIDGE_API_KEY": "your-strong-random-bridge-key"
+  },
+  "environment_variable_notes": {
+    "NOTION_TOKEN": "Your Notion internal integration token.",
+    "TECH_ROOM_PAGE_ID": "This is just the current env var name. Paste the page ID of the main Notion page you want the bridge to use as its default root.",
+    "BRIDGE_API_KEY": "Make up a long random secret. Use this exact same value in GPT Actions auth."
+  },
+  "gpt_action_auth": {
+    "type": "apiKey",
+    "header_name": "x-bridge-key",
+    "api_key_value_source": "same value as BRIDGE_API_KEY"
+  },
+  "manual_replacements_before_use": [
+    "Replace the server URL in NOTION_BRIDGE_GPT_SCHEMA_SHAREABLE.json with your own Netlify site URL.",
+    "Paste your real env var values into Netlify before testing.",
+    "Save the Action after schema edits, then start a new chat."
+  ],
+  "currently_working_endpoints": [
+    "health",
+    "search-pages",
+    "create-page",
+    "rename-page",
+    "append-text",
+    "create-database",
+    "search-databases",
+    "create-database-row-simple",
+    "query-database-rows",
+    "update-database-row-simple",
+    "create-comment-on-page",
+    "list-comments",
+    "get-block-children"
+  ],
+  "smoke_tests_in_order": [
+    {
+      "endpoint": "/health",
+      "method": "GET",
+      "expected": "{\"ok\":true,\"message\":\"Bridge is running\"}"
+    },
+    {
+      "endpoint": "/search-pages",
+      "method": "POST",
+      "body": {
+        "query": "Tech Room",
+        "limit": 5
+      }
+    },
+    {
+      "endpoint": "/create-page",
+      "method": "POST",
+      "body": {
+        "title": "Bridge Smoke Test",
+        "content": "Hello from bridge"
+      }
+    },
+    {
+      "endpoint": "/rename-page",
+      "method": "POST",
+      "body": {
+        "page_id": "<page_id_from_create_page>",
+        "title": "Bridge Smoke Test Renamed"
+      }
+    },
+    {
+      "endpoint": "/append-text",
+      "method": "POST",
+      "body": {
+        "page_id": "<page_id_from_create_page>",
+        "text": "Second line from bridge"
+      }
+    },
+    {
+      "endpoint": "/create-database",
+      "method": "POST",
+      "body": {
+        "parent_page_id": "<your_page_id>",
+        "title": "Bridge Tasks"
+      }
+    },
+    {
+      "endpoint": "/create-comment-on-page",
+      "method": "POST",
+      "body": {
+        "page_id": "<page_id_from_create_page>",
+        "comment_text": "Smoke test comment"
+      }
+    },
+    {
+      "endpoint": "/list-comments",
+      "method": "POST",
+      "body": {
+        "page_id": "<page_id_from_create_page>",
+        "limit": 10
+      }
+    }
+  ],
+  "common_failures": {
+    "401_unauthorized": "x-bridge-key value mismatch between GPT Actions and Netlify env vars.",
+    "500_missing_bridge_key": "BRIDGE_API_KEY env var is missing or misspelled.",
+    "500_missing_root_page_id": "TECH_ROOM_PAGE_ID env var is missing or misspelled.",
+    "openapi_parse_error": "The schema JSON has a broken comma, quote, or brace.",
+    "client_response_error": "GPT Actions may still be using old auth or an old schema session. Save the Action and start a new chat."
+  },
+  "notes": [
+    "Deploy the whole project folder, not only notion-bridge.js.",
+    "Share the target Notion pages and databases with the integration before testing.",
+    "list-comments accepts page_id for convenience, but the backend sends block_id to Notion.",
+    "This package is usable now and still being refined."
+  ]
+}

@@ -1,0 +1,496 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Notion Bridge (Shareable)",
+    "version": "1.2.0",
+    "description": "Work in progress. Shareable Custom GPT Action schema for a Netlify-hosted Notion bridge."
+  },
+  "servers": [
+    {
+      "url": "https://YOUR-NETLIFY-SITE.netlify.app/.netlify/functions/notion-bridge",
+      "description": "Replace with your own Netlify Function URL."
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "BridgeKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-bridge-key",
+        "description": "Use the same value you set in Netlify as BRIDGE_API_KEY."
+      }
+    }
+  },
+  "security": [
+    {
+      "BridgeKey": []
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "operationId": "health",
+        "summary": "Check whether the bridge is running",
+        "responses": {
+          "200": {
+            "description": "Bridge is running"
+          }
+        }
+      }
+    },
+    "/search-pages": {
+      "post": {
+        "operationId": "searchPages",
+        "summary": "Search Notion pages the integration can access",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "Optional search text."
+                  },
+                  "limit": {
+                    "type": "integer",
+                    "description": "Optional result limit."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Matching pages"
+          }
+        }
+      }
+    },
+    "/create-page": {
+      "post": {
+        "operationId": "createPage",
+        "summary": "Create a new page",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "title"
+                ],
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "description": "Page title."
+                  },
+                  "content": {
+                    "type": "string",
+                    "description": "Optional starter text."
+                  },
+                  "parent_page_id": {
+                    "type": "string",
+                    "description": "Optional parent page ID. If omitted, the bridge root page is used."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Page created"
+          }
+        }
+      }
+    },
+    "/rename-page": {
+      "post": {
+        "operationId": "renamePage",
+        "summary": "Rename an existing page",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "page_id",
+                  "title"
+                ],
+                "properties": {
+                  "page_id": {
+                    "type": "string",
+                    "description": "Target page ID."
+                  },
+                  "title": {
+                    "type": "string",
+                    "description": "New page title."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Page renamed"
+          }
+        }
+      }
+    },
+    "/append-text": {
+      "post": {
+        "operationId": "appendText",
+        "summary": "Append plain text to a page",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "page_id",
+                  "text"
+                ],
+                "properties": {
+                  "page_id": {
+                    "type": "string",
+                    "description": "Target page ID."
+                  },
+                  "text": {
+                    "type": "string",
+                    "description": "Text to append."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Text appended"
+          }
+        }
+      }
+    },
+    "/create-database": {
+      "post": {
+        "operationId": "createDatabase",
+        "summary": "Create a database under a page",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "parent_page_id",
+                  "title"
+                ],
+                "properties": {
+                  "parent_page_id": {
+                    "type": "string",
+                    "description": "Parent page ID."
+                  },
+                  "title": {
+                    "type": "string",
+                    "description": "Database title."
+                  },
+                  "properties": {
+                    "type": "object",
+                    "description": "Optional raw Notion database properties object."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Database created"
+          }
+        }
+      }
+    },
+    "/search-databases": {
+      "post": {
+        "operationId": "searchDatabases",
+        "summary": "Search databases the integration can access",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "Optional search text."
+                  },
+                  "limit": {
+                    "type": "integer",
+                    "description": "Optional result limit."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Matching databases"
+          }
+        }
+      }
+    },
+    "/create-database-row-simple": {
+      "post": {
+        "operationId": "createDatabaseRowSimple",
+        "summary": "Create a simple row in a simple database",
+        "description": "This expects a database with common fields like Name, Status, and Priority.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "database_id",
+                  "name"
+                ],
+                "properties": {
+                  "database_id": {
+                    "type": "string",
+                    "description": "Database ID."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Row name/title."
+                  },
+                  "status": {
+                    "type": "string",
+                    "description": "Optional status value."
+                  },
+                  "priority": {
+                    "type": "string",
+                    "description": "Optional priority value."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Row created"
+          }
+        }
+      }
+    },
+    "/query-database-rows": {
+      "post": {
+        "operationId": "queryDatabaseRows",
+        "summary": "Query simple rows from a database",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "database_id"
+                ],
+                "properties": {
+                  "database_id": {
+                    "type": "string",
+                    "description": "Database ID."
+                  },
+                  "name_equals": {
+                    "type": "string",
+                    "description": "Optional exact match on row name."
+                  },
+                  "limit": {
+                    "type": "integer",
+                    "description": "Optional result limit."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Matching rows"
+          }
+        }
+      }
+    },
+    "/update-database-row-simple": {
+      "post": {
+        "operationId": "updateDatabaseRowSimple",
+        "summary": "Update Status or Priority on a simple row",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "page_id"
+                ],
+                "properties": {
+                  "page_id": {
+                    "type": "string",
+                    "description": "Row page ID."
+                  },
+                  "status": {
+                    "type": "string",
+                    "description": "Optional new status value."
+                  },
+                  "priority": {
+                    "type": "string",
+                    "description": "Optional new priority value."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Row updated"
+          }
+        }
+      }
+    },
+    "/create-comment-on-page": {
+      "post": {
+        "operationId": "createCommentOnPage",
+        "summary": "Create a comment on a page",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "page_id",
+                  "comment_text"
+                ],
+                "properties": {
+                  "page_id": {
+                    "type": "string",
+                    "description": "Target page ID."
+                  },
+                  "comment_text": {
+                    "type": "string",
+                    "description": "Comment text."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Comment created"
+          }
+        }
+      }
+    },
+    "/list-comments": {
+      "post": {
+        "operationId": "listComments",
+        "summary": "List comments for a page or block",
+        "description": "You can send page_id for convenience. The backend maps it to the block_id query parameter required by Notion.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "page_id": {
+                    "type": "string",
+                    "description": "Page ID. Easiest option for most GPT calls."
+                  },
+                  "block_id": {
+                    "type": "string",
+                    "description": "Optional block ID. If provided, it takes priority over page_id."
+                  },
+                  "limit": {
+                    "type": "integer",
+                    "description": "Optional result limit."
+                  },
+                  "start_cursor": {
+                    "type": "string",
+                    "description": "Optional pagination cursor."
+                  }
+                },
+                "anyOf": [
+                  {
+                    "required": [
+                      "page_id"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "block_id"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Comments list"
+          }
+        }
+      }
+    },
+    "/get-block-children": {
+      "post": {
+        "operationId": "getBlockChildren",
+        "summary": "Get child blocks for a page",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "page_id"
+                ],
+                "properties": {
+                  "page_id": {
+                    "type": "string",
+                    "description": "Page ID."
+                  },
+                  "page_size": {
+                    "type": "integer",
+                    "description": "Optional result limit."
+                  },
+                  "start_cursor": {
+                    "type": "string",
+                    "description": "Optional pagination cursor."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Child blocks"
+          }
+        }
+      }
+    }
+  }
+}
