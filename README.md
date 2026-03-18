@@ -1,77 +1,68 @@
 # Notion Bridge Shareable
 
-Public shareable files for a Custom GPT + Netlify bridge that connects to Notion.
+A public starter pack to connect a Custom GPT to Notion through Netlify Functions.
 
-This package is a **work in progress**, but it is already usable.
+This package is a **work in progress** and currently usable.
 
-## Start here
-If you are new to this setup, open `NOTION_BRIDGE_SHAREABLE_SETUP.md` first.
-
-That guide walks you through:
-- creating the Notion integration
-- setting the Netlify environment variables
-- pasting the schema into GPT Actions
-- testing the bridge in a safe order
-
-If you only need the schema, use `NOTION_BRIDGE_GPT_SCHEMA_SHAREABLE.json`.
-
-Important:
-After any schema change in GPT Actions, save the Action and start a new chat.
-
-## What works right now
-- health check
-- search pages
-- create page
-- rename page
-- append text
-- create database
-- search databases
-- create/query/update simple rows
-- create comments
-- list comments
-- get block children
+## Quickstart (first-time users)
+1. Deploy this repo to Netlify.
+2. Set Netlify env vars: `NOTION_TOKEN`, `TECH_ROOM_PAGE_ID`, `BRIDGE_API_KEY`.
+3. Open `NOTION_BRIDGE_GPT_SCHEMA_SHAREABLE.json` and replace `YOUR-NETLIFY-SITE`.
+4. Paste schema into GPT Actions.
+5. In GPT Action auth, set header `x-bridge-key` with the same value as `BRIDGE_API_KEY`.
+6. Save Action and start a new chat.
+7. Run tests: `health` -> `search-pages` -> `create-page`.
 
 ## Files in this repo
+- `netlify.toml`
+- `netlify/functions/notion-bridge.js`
 - `NOTION_BRIDGE_GPT_SCHEMA_SHAREABLE.json`
 - `NOTION_BRIDGE_DEPLOYABLE_CONFIG_TEMPLATE.json`
 - `NOTION_BRIDGE_SHAREABLE_SETUP.md`
 - `NOTION_BRIDGE_SHAREABLE_SETUP.docx`
 
-## What this repo is for
-Use this repo as the public download home for the shareable setup files.
+## Implemented endpoints (source of truth)
+- `GET /health`
+- `POST /search-pages`
+- `POST /get-page`
+- `POST /create-page`
+- `POST /rename-page`
+- `POST /append-text`
+- `POST /append-checkboxes`
+- `POST /append-toggle`
+- `POST /set-checkbox-state`
+- `POST /append-blocks`
+- `POST /get-block-children`
+- `POST /create-database`
+- `POST /create-database-page`
+- `POST /update-page-properties`
+- `POST /create-database-row-simple`
+- `POST /search-databases`
+- `POST /query-database-rows`
+- `POST /update-database-row-simple`
+- `POST /create-comment-on-page`
+- `POST /list-comments`
 
-It is meant for:
-- the latest public schema
-- the latest public setup guide
-- placeholder/template config files
+## Current limitations
+> - This bridge does not auto-disambiguate similar page names. Search may return multiple matches.
+> - Checkbox state updates require a checkbox `block_id` (get it first via `get-block-children`).
+> - Advanced block transforms (full in-place rewriting logic) are limited.
+> - `TECH_ROOM_PAGE_ID` is a legacy env var name; it means your default root page ID.
 
-It is **not** meant for:
-- real Notion tokens
-- real API keys
-- personal Netlify values
-- private experiments
+## About `TECH_ROOM_PAGE_ID`
+The variable name is historical.
 
-## Important safety rule
-Never upload real secrets.
+Use it as: **default root page ID** for page creation when no `parent_page_id` is passed.
 
-Do not commit:
-- `NOTION_TOKEN`
-- `BRIDGE_API_KEY`
-- private page IDs you do not want public
-- personal environment files
+If you want to rename this to `ROOT_PAGE_ID`, update both the code and docs together before publishing a new version.
 
-Only upload templates and placeholder values.
+## Safety
+Never commit real secrets.
 
-## Quick use
-1. Deploy the bridge project to Netlify.
-2. Add your env vars in Netlify.
-3. Open `NOTION_BRIDGE_GPT_SCHEMA_SHAREABLE.json`.
-4. Replace the placeholder Netlify URL with your own URL.
-5. Paste the full schema into GPT Actions.
-6. Save the Action.
-7. Start a new chat.
+Do not publish:
+- real `NOTION_TOKEN`
+- real `BRIDGE_API_KEY`
+- personal page IDs you do not want public
 
-## Notes
-- `list-comments` accepts `page_id` for convenience.
-- The backend maps that to the `block_id` query parameter that Notion expects.
-- The setup docs are intentionally beginner-friendly and may keep improving.
+## Note
+After any Action schema edit, always save and start a new chat.
