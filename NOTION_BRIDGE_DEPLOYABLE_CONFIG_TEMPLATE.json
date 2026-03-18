@@ -30,18 +30,27 @@
   "currently_working_endpoints": [
     "health",
     "search-pages",
+    "get-page",
     "create-page",
     "rename-page",
     "append-text",
+    "append-checkboxes",
+    "append-toggle",
+    "set-checkbox-state",
+    "append-blocks",
+    "get-block-children",
     "create-database",
-    "search-databases",
+    "create-database-page",
+    "update-page-properties",
     "create-database-row-simple",
+    "search-databases",
     "query-database-rows",
     "update-database-row-simple",
     "create-comment-on-page",
-    "list-comments",
-    "get-block-children"
+    "list-comments"
   ],
+  "smoke_test_scope": "intentionally_minimal",
+  "smoke_test_scope_note": "Smoke tests stay intentionally minimal for first-time setup reliability. Advanced endpoints are public and listed above, but tested after core success.",
   "smoke_tests_in_order": [
     {
       "endpoint": "/health",
